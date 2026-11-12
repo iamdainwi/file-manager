@@ -1,0 +1,11 @@
+{
+  "name": "file-manager",
+  "version": "1.0.0",
+  "description": "``` file-manager/ │ ├── src/ │   │ │   ├── core/ │   │   ├── directory.js │   │   ├── file.js │   │   ├── file-operations.js │   │   ├── file-search.js │   │   ├── file-metadata.js │   │   └── file-watcher.js │   │ │   ├── commands/ │   │   ├── create.js │   │   ├── delete.js │   │   ├── rename.js │   │   ├── move.js │   │   ├── copy.js │   │   ├── read.js │   │   ├── write.js │   │   ├── list.js │   │   ├── search.js │   │   └── info.js │   │ │   ├── utils/ │   │   ├── path-utils.js │   │   ├── format-size.js │   │   ├── format-date.js │   │   ├── validators.js │   │   └── error-handler.js │   │ │   ├── config/ │   │   ├── constants.js │   │   └── settings.js │   │ │   ├── cli/ │   │   ├── interface.js │   │   ├── menu.js │   │   ├── display.js │   │   └── input-handler.js │   │ │   └── index.js │ ├── tests/ │   ├── core/ │   │   ├── directory.test.js │   │   ├── file.test.js │   │   ├── file-operations.test.js │   │   └── file-search.test.js │   │ │   ├── commands/ │   │   ├── create.test.js │   │   ├── delete.test.js │   │   └── rename.test.js │   │ │   └── utils/ │       └── validators.test.js │ ├── contents/ │   └── .gitkeep │ ├── logs/ │   └── .gitkeep │ ├── .gitignore ├── .env.example ├── package.json ├── package-lock.json ├── README.md └── LICENSE",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "type": "module"
+}

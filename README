@@ -1,0 +1,261 @@
+```
+file-manager/
+│
+├── src/
+│   │
+│   ├── core/
+│   │   ├── directory.js
+│   │   ├── file.js
+│   │   ├── file-operations.js
+│   │   ├── file-search.js
+│   │   ├── file-metadata.js
+│   │   └── file-watcher.js
+│   │
+│   ├── commands/
+│   │   ├── create.js
+│   │   ├── delete.js
+│   │   ├── rename.js
+│   │   ├── move.js
+│   │   ├── copy.js
+│   │   ├── read.js
+│   │   ├── write.js
+│   │   ├── list.js
+│   │   ├── search.js
+│   │   └── info.js
+│   │
+│   ├── utils/
+│   │   ├── path-utils.js
+│   │   ├── format-size.js
+│   │   ├── format-date.js
+│   │   ├── validators.js
+│   │   └── error-handler.js
+│   │
+│   ├── config/
+│   │   ├── constants.js
+│   │   └── settings.js
+│   │
+│   ├── cli/
+│   │   ├── interface.js
+│   │   ├── menu.js
+│   │   ├── display.js
+│   │   └── input-handler.js
+│   │
+│   └── index.js
+│
+├── tests/
+│   ├── core/
+│   │   ├── directory.test.js
+│   │   ├── file.test.js
+│   │   ├── file-operations.test.js
+│   │   └── file-search.test.js
+│   │
+│   ├── commands/
+│   │   ├── create.test.js
+│   │   ├── delete.test.js
+│   │   └── rename.test.js
+│   │
+│   └── utils/
+│       └── validators.test.js
+│
+├── contents/
+│   └── .gitkeep
+│
+├── logs/
+│   └── .gitkeep
+│
+├── .gitignore
+├── .env.example
+├── package.json
+├── package-lock.json
+├── README.md
+└── LICENSE
+
+```
+
+For your File Manager project, each file should have one clearly defined responsibility. The objective is to keep filesystem operations separate from CLI interaction, validation, formatting, and application configuration.
+
+I'll explain what belongs in each file, without writing implementation code.
+
+# 1. `src/` — Application source
+
+This contains the entire application.
+
+## `src/core/` — Filesystem engine
+
+This is the most important part of your application. It directly interacts with Node.js filesystem APIs (`node:fs/promises`).
+
+| File                 | Responsibility                                                                     |
+| -------------------- | ---------------------------------------------------------------------------------- |
+| `directory.js`       | Directory creation, deletion, existence checks, directory listing, and navigation. |
+| `file.js`            | Basic file operations: create, read, write, append, and delete.                    |
+| `file-operations.js` | Advanced operations: copy, move, rename, and file transfers.                       |
+| `file-search.js`     | Search files and directories by name, extension, pattern, and other criteria.      |
+| `file-metadata.js`   | Retrieve file size, extension, timestamps, permissions, and file type.             |
+| `file-watcher.js`    | Monitor filesystem changes such as file creation, deletion, and modification.      |
+
+Important distinction: `file.js` handles individual file operations. `file-operations.js` handles operations that manipulate existing files or directories.
+
+## `src/commands/` — Application commands
+
+These files connect user-requested operations to the filesystem engine.
+
+| File        | Responsibility                                   |
+| ----------- | ------------------------------------------------ |
+| `create.js` | Handle requests to create files and directories. |
+| `delete.js` | Handle file and directory deletion.              |
+| `rename.js` | Handle renaming files and directories.           |
+| `move.js`   | Handle moving files and directories.             |
+| `copy.js`   | Handle copying files and directories.            |
+| `read.js`   | Handle reading file contents.                    |
+| `write.js`  | Handle writing and appending file contents.      |
+| `list.js`   | Handle directory listing requests.               |
+| `search.js` | Handle file and directory search requests.       |
+| `info.js`   | Display file and directory metadata.             |
+
+Why separate commands from core?
+
+Imagine the user enters a `delete` command.
+
+The flow should be:
+
+`CLI → delete.js → file.js / directory.js → Filesystem`
+
+The command handles the request; the core handles the actual filesystem operation.
+
+## `src/utils/` — Reusable utilities
+
+These files contain functionality that can be reused throughout the application.
+
+| File               | Responsibility                                                       |
+| ------------------ | -------------------------------------------------------------------- |
+| `path-utils.js`    | Path normalization, joining, resolving, and path validation helpers. |
+| `format-size.js`   | Convert bytes into KB, MB, GB, etc.                                  |
+| `format-date.js`   | Format creation, modification, and access dates.                     |
+| `validators.js`    | Validate paths, filenames, extensions, and user inputs.              |
+| `error-handler.js` | Centralized error handling and consistent error messages.            |
+
+## `src/config/` — Configuration
+
+| File           | Responsibility                                                                               |
+| -------------- | -------------------------------------------------------------------------------------------- |
+| `constants.js` | Application-wide constants, error codes, supported file types, and default values.           |
+| `settings.js`  | Runtime settings such as workspace directory, logging preferences, and application behavior. |
+
+## `src/cli/` — Terminal interface
+
+This layer handles everything the user sees and interacts with in the terminal.
+
+| File               | Responsibility                                                       |
+| ------------------ | -------------------------------------------------------------------- |
+| `interface.js`     | Initialize the CLI and manage the interactive application lifecycle. |
+| `menu.js`          | Display available commands and interactive menus.                    |
+| `display.js`       | Format and display output, tables, file lists, and status messages.  |
+| `input-handler.js` | Accept and process user input, arguments, and command selections.    |
+
+## `src/index.js` — Application entry point
+
+This is the main entry point of your application.
+
+It should:
+
+- Initialize the application.
+- Load configurations.
+- Initialize the CLI.
+- Connect the CLI to the command handlers.
+- Handle application startup and shutdown.
+
+# 2. `tests/` — Testing
+
+This directory contains automated tests. Use Node.js's built-in `node:test` and `node:assert` initially.
+
+## `tests/core/`
+
+| File                      | What to test                                              |
+| ------------------------- | --------------------------------------------------------- |
+| `directory.test.js`       | Directory creation, existence, deletion, and listing.     |
+| `file.test.js`            | File creation, reading, writing, appending, and deletion. |
+| `file-operations.test.js` | Copying, moving, and renaming.                            |
+| `file-search.test.js`     | Search results, filters, and recursive searches.          |
+
+## `tests/commands/`
+
+| File             | What to test                                |
+| ---------------- | ------------------------------------------- |
+| `create.test.js` | Create command behavior and invalid inputs. |
+| `delete.test.js` | Delete command behavior and error handling. |
+| `rename.test.js` | Rename command behavior and conflicts.      |
+
+## `tests/utils/`
+
+| File                 | What to test                                        |
+| -------------------- | --------------------------------------------------- |
+| `validators.test.js` | Valid and invalid paths, filenames, and extensions. |
+
+# 3. Root directory files
+
+| File                | Responsibility                                                                 |
+| ------------------- | ------------------------------------------------------------------------------ |
+| `.gitignore`        | Exclude `node_modules`, logs, environment files, and temporary files from Git. |
+| `.env.example`      | Document environment variables required by the application.                    |
+| `package.json`      | Project metadata, dependencies, scripts, and ES module configuration.          |
+| `package-lock.json` | Lock exact dependency versions for reproducible installations.                 |
+| `README.md`         | Project documentation, installation, usage, features, and examples.            |
+| `LICENSE`           | Define the legal terms under which others can use your project.                |
+
+# 4. Application data directories
+
+| Directory/file      | Responsibility                                        |
+| ------------------- | ----------------------------------------------------- |
+| `contents/`         | Workspace where you can test file-manager operations. |
+| `contents/.gitkeep` | Ensure Git tracks the otherwise-empty directory.      |
+| `logs/`             | Store application logs and error records.             |
+| `logs/.gitkeep`     | Ensure Git tracks the otherwise-empty directory.      |
+
+# 5. How everything connects
+
+This is the architecture I recommend following:
+
+CLI Layer
+
+interface · menu · input-handler · display
+
+Command Layer
+
+create · delete · rename · copy · move · search
+
+Core Layer
+
+file · directory · file-operations · file-search
+
+Node.js Filesystem
+
+node:fs/promises · node:path · node:fs
+
+Shared dependencies
+
+Utils
+
+Config
+
+Tests
+
+# 6. Recommended development order
+
+Don't develop these files in alphabetical order. Follow the dependency order.
+
+| Priority | Files                            | Goal                              |
+| -------- | -------------------------------- | --------------------------------- |
+| 1        | `path-utils.js`, `validators.js` | Path handling and validation      |
+| 2        | `directory.js`, `file.js`        | Basic filesystem operations       |
+| 3        | `file-operations.js`             | Copy, move, rename                |
+| 4        | `file-metadata.js`               | File information                  |
+| 5        | `file-search.js`                 | Searching                         |
+| 6        | `file-watcher.js`                | Monitoring changes                |
+| 7        | `commands/*`                     | Connect operations to commands    |
+| 8        | `cli/*`                          | Build terminal interface          |
+| 9        | `index.js`                       | Integrate everything              |
+| 10       | `tests/*`                        | Test and refine all functionality |
+
+One architectural recommendation: Don't let multiple files independently implement the same filesystem operation. For example, `commands/delete.js` should call the appropriate core function rather than implementing deletion itself.
+
+Start with `directory.js` and `file.js`. Once those are working and tested, build the remaining layers.

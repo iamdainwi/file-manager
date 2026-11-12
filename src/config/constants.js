@@ -1,6 +1,7 @@
 const STATUS = {
   SUCESS: Symbol('SUCESS'),
   FAILED: Symbol('FAILED'),
+  SKIPPED: Symbol('SKIPPED'),
 };
 
 export const ITEM_STATUS = Object.freeze(STATUS);

@@ -5,8 +5,8 @@
  * createDir() function to create directory -> Completed
  * deleteDir() function to delete directory
  * getDirInfo() function to get directory information -> Completed
- * TODO: moveDir() function to move the directory from one to another place
- * TODO: copyDir() function to copy directory from one to another place
+ * moveDir() function to move the directory from one to another place -> Completed
+ * copyDir() function to copy directory from one to another place -> Completed
  * renameDir() function to rename the directory -> Completed
  */
 
@@ -186,7 +186,7 @@ async function renameDir(dirName, newName) {
         itemName: 'contents',
         itemType: itemType.DIRECTORY,
         itemPath: fullPath,
-        status: ITEM_STATUS.SUCESS,
+        status: ITEM_STATUS.SUCCESS,
         details: {
           message: 'Directory has been renamed',
           from: dirName,
@@ -216,12 +216,148 @@ async function renameDir(dirName, newName) {
   }
 }
 
-
 async function moveDir(sourcePath, destPath) {
-  const fullPath = getFullPath(sourcePath);
-  try {
-    await fs.cp
-  } catch (error) {
+  const fullSourcePath = getFullPath(sourcePath);
 
+  const itemName = path.basename(fullSourcePath);
+  const fullDestPath = path.join(getFullPath(destPath), itemName);
+
+  try {
+    const sourceStat = await fs.stat(fullSourcePath);
+
+    if (!sourceStat.isDirectory()) {
+      throw new Error('Source is not a directory');
+    }
+
+    const relativePath = path.relative(fullSourcePath, fullDestPath);
+
+    if (
+      relativePath === '' ||
+      (!relativePath.startsWith('..' + path.sep) &&
+        relativePath !== '..' &&
+        !path.isAbsolute(relativePath))
+    ) {
+      throw new Error('Cannot move directory into itself');
+    }
+
+    try {
+      await fs.access(fullDestPath);
+      throw new Error('Destination already exists');
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
+
+    await fs.cp(fullSourcePath, fullDestPath, {
+      recursive: true,
+      errorOnExist: true,
+      force: false,
+    });
+
+    await fs.rm(fullSourcePath, {
+      recursive: true,
+      force: false,
+    });
+
+    await logActivity({
+      action: DirectoryActivityType.DIRECTORY_MOVED,
+      itemName,
+      itemPath: fullDestPath,
+      itemType: itemType.DIRECTORY,
+      status: ITEM_STATUS.SUCCESS,
+      details: {
+        previousPath: fullSourcePath,
+        destinationPath: fullDestPath,
+      },
+    });
+
+    return true;
+  } catch (error) {
+    console.error(error.message);
+
+    await logActivity({
+      action: DirectoryActivityType.DIRECTORY_MOVED,
+      itemName,
+      itemPath: fullSourcePath,
+      itemType: itemType.DIRECTORY,
+      status: ITEM_STATUS.FAILED,
+      details: {
+        error: error.message,
+        errorCode: error.code ?? null,
+      },
+    });
+
+    return false;
   }
 }
+
+async function copyDir(sourcePath, destPath) {
+  const fullSourcePath = getFullPath(sourcePath);
+
+  const itemName = path.basename(fullSourcePath);
+  const fullDestPath = path.join(getFullPath(destPath), itemName);
+
+  try {
+    const sourceStat = await fs.stat(fullSourcePath);
+
+    if (!sourceStat.isDirectory()) {
+      throw new Error('Source is not a directory');
+    }
+
+    const relativePath = path.relative(fullSourcePath, fullDestPath);
+
+    if (
+      relativePath === '' ||
+      (!relativePath.startsWith('..' + path.sep) &&
+        relativePath !== '..' &&
+        !path.isAbsolute(relativePath))
+    ) {
+      throw new Error('Cannot move directory into itself');
+    }
+
+    try {
+      await fs.access(fullDestPath);
+      throw new Error('Destination already exists');
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
+
+    await fs.cp(fullSourcePath, fullDestPath, {
+      recursive: true,
+      errorOnExist: true,
+      force: false,
+    });
+
+    await logActivity({
+      action: DirectoryActivityType.DIRECTORY_COPIED,
+      itemName,
+      itemPath: fullDestPath,
+      itemType: itemType.DIRECTORY,
+      status: ITEM_STATUS.SUCCESS,
+      details: {
+        previousPath: fullSourcePath,
+        destinationPath: fullDestPath,
+      },
+    });
+
+    return true;
+  } catch (error) {
+    console.error(error.message);
+
+    await logActivity({
+      action: DirectoryActivityType.DIRECTORY_COPIED,
+      itemName,
+      itemPath: fullSourcePath,
+      itemType: itemType.DIRECTORY,
+      status: ITEM_STATUS.FAILED,
+      details: {
+        error: error.message,
+        errorCode: error.code ?? null,
+      },
+    });
+
+    return false;
+  }
+}
+
+copyDir('data/images', 'contents/');
+// copyDir('contents/images', 'data/');

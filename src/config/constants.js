@@ -1,5 +1,5 @@
 const STATUS = {
-  SUCESS: Symbol('SUCESS'),
+  SUCESS: Symbol('SUCCESS'),
   FAILED: Symbol('FAILED'),
   SKIPPED: Symbol('SKIPPED'),
 };

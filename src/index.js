@@ -71,6 +71,7 @@ app.get('/', (req, res) => {
             <th>Item Name</th>
             <th>Item Path</th>
             <th>Action</th>
+            <th>Status</th>
             <th>Timestamp</th>
           </tr>
         </thead>
@@ -106,12 +107,14 @@ app.get('/', (req, res) => {
               const name = log.item_name || '-';
               const pathVal = log.item_path || '-';
               const action = log.action || '-';
+              const status = log.status || '-';
               const time = log.timestamp ? new Date(log.timestamp).toLocaleString() : '-';
 
               row.innerHTML = \`
                 <td>\${name}</td>
                 <td class="path-cell">\${pathVal}</td>
                 <td>\${action}</td>
+                <td>\${status}</td>
                 <td class="time-cell">\${time}</td>
               \`;
               
